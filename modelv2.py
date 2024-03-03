@@ -109,4 +109,4 @@ print('Validation Loss =', val_loss)
 
 
 # Save the model
-model.save('asl_model.h5')
+model.save('asl_model.keras')

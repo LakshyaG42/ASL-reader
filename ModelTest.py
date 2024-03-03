@@ -3,7 +3,7 @@ import numpy as np
 from keras.models import load_model
 
 # Load the pre-trained model
-model = load_model('asl_model.h5')
+model = load_model('asl_model.keras')
 
 # Dictionary mapping index to ASL characters
 asl_characters = {0: "0", 1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9",
@@ -28,6 +28,6 @@ def predict_asl_character(image_path):
     return asl_characters[predicted_class]
 
 
-image_path = 'example_image.jpg'
+image_path = 'IMG_4271.PNG'
 predicted_character = predict_asl_character(image_path)
 print("Predicted ASL Character:", predicted_character)
