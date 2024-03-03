@@ -10,23 +10,24 @@ import os
 import time
 
 
-path = '/kaggle/input/asl-dataset/'
+path = 'kaggle\input\\asl_dataset'
 
 data, label = [], []
 
+# Iterate over each label folder
 for root, dirs, files in os.walk(path):
-    key = os.path.basename(root)
-    for file in files:
-        full_file_path = os.path.join(root, file)
-        img = cv2.imread(full_file_path)
+    for image_file in files:
+        label_folder = os.path.basename(root)
+        label_path = os.path.join(path, label_folder)
+        image_path = os.path.join(root, image_file)
+        img = cv2.imread(image_path)
         img = cv2.resize(img, (128, 128))
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         data.append(img)
-        label.append(key)
-
+        label.append(label_folder)
 data = np.array(data)
 label = np.array(label)
-
+print(data)
 # Define data transformations (you may need to adjust these)
 data_transforms = {
     'train': transforms.Compose([
@@ -64,8 +65,8 @@ class ASLDataset(torch.utils.data.Dataset):
 train_size = int(0.8 * len(data))
 val_size = len(data) - train_size
 
-train_data, val_data = torch.utils.data.random_split(data, [train_size, val_size])
-train_label, val_label = torch.utils.data.random_split(label, [train_size, val_size])
+train_data, val_data = data[:train_size], data[train_size:]
+train_label, val_label = label[:train_size], label[train_size:]
 
 image_datasets = {
     'train': ASLDataset(train_data, train_label, transform=data_transforms['train']),
@@ -76,11 +77,10 @@ dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=64, 
 dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 class_names = np.unique(label)
 
-# Load a pre-trained MobileNetV2 model
-model = models.mobilenet_v2(pretrained=True)
+model = models.mobilenet_v2(weights=True)
 num_ftrs = model.classifier[1].in_features
 
-# Modify the model's final layer for your classification task
+#Last 
 model.classifier[1] = nn.Linear(num_ftrs, len(class_names))
 
 # Define loss function and optimizer
@@ -95,7 +95,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model.to(device)
 num_epochs = 25
 start_time = time.time()
-for epoch in range(num_epochs):  # Adjust the number of epochs as needed
+for epoch in range(num_epochs):
     for phase in ['train', 'val']:
         if phase == 'train':
             model.train()
@@ -129,6 +129,6 @@ for epoch in range(num_epochs):  # Adjust the number of epochs as needed
         epoch_loss = running_loss / dataset_sizes[phase]
         epoch_acc = running_corrects.double() / dataset_sizes[phase]
 
-        print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
-print("Training Time: {} ").format({time.time()-start_time})
+        print(f'{phase} Loss: {epoch_loss} Acc: {epoch_acc}')
+print(f"Training Time: {time.time()-start_time}")
 print("Training complete!")
