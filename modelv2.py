@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import random
-
+import tensorflow
+import mmdetection 
 from sklearn.model_selection import train_test_split
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
@@ -12,7 +13,7 @@ from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras.preprocessing.image import ImageDataGenerator
 
 # Define the path to the dataset
-data_path = '/kaggle/input/asl-dataset/asl_dataset'
+data_path = 'kaggle\input\\asl_dataset\\asl_dataset'
 
 # Create a dictionary of relationship between label and sign
 categories = {
@@ -40,24 +41,6 @@ for directory in os.listdir(data_path):
 
 # Create a DataFrame from the collected data
 df = pd.DataFrame({'file': file_list, 'image': image_list, 'label': label_list})
-
-# Visualize random images from the dataset
-plt.figure(figsize=(11, 11))
-for i in range(1, 26):
-    plt.subplot(5, 5, i)
-    plt.tight_layout()
-    plt.axis('off')
-    rand_val = random.choice(list(categories.values()))
-    rand_img = plt.imread(os.path.join(data_path, rand_val, random.choice(sorted(os.listdir(os.path.join(data_path, rand_val))))))
-    plt.imshow(rand_img)
-    plt.title(rand_val)
-
-# Visualize distribution of images by sign in dataset
-sign_freq = df['label'].value_counts().reset_index().sort_values('label')
-sns.barplot(data=sign_freq, x='label', y='index', palette='icefire')
-plt.xlabel('ASL Sign')
-plt.ylabel('Image Count')
-plt.title('Count of Images by Sign')
 
 # Split dataframe into train, test, and validation sets
 x_train, x_test0, y_train, y_test0 = train_test_split(df['file'], df['label'], test_size=0.25, random_state=42)
@@ -122,3 +105,7 @@ print('Train Loss =', train_loss)
 val_loss, val_accuracy = model.evaluate(val_data)
 print('Validation Accuracy =', val_accuracy)
 print('Validation Loss =', val_loss)
+
+
+# Save the model
+model.save('asl_model.h5')
