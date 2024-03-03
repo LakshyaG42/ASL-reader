@@ -5,7 +5,8 @@ import seaborn as sns
 import os
 import random
 import tensorflow
-import mmdetection 
+import torch 
+
 from sklearn.model_selection import train_test_split
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
